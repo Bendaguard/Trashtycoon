@@ -86,11 +86,10 @@ class Game:
         self.HOUSE_image = pygame.image.load("img/House.png")
         self.HOUSE_image = pygame.transform.scale(self.HOUSE_image, (130, 160))
         self.houserect = self.HOUSE_image.get_rect(topleft=(40, 680))
-        
-        
-
-        # Character properties
+        # 450, 660
+        #Text properties
         textx,texty = 600, 50
+        # Character properties
         char_velocity_x = 0
         char_velocity_y = 0
         gravity = 1
@@ -134,8 +133,8 @@ class Game:
                             print("Trash:", self.trash)
                             self.texttrash = "Trash :" + str(self.trash)
                             self.text = font.render(self.texttrash, True, "black")
-                            textRect = self.text.get_rect()
-                            textRect.topleft = (textx, texty)
+                            self.textRect = self.text.get_rect()
+                            self.textRect.topleft = (textx, texty)
 
                         elif housed:
                             self.char_x, self.char_y = 700, 600 
@@ -311,6 +310,29 @@ class Game:
         self.backButtons_rect = self.backButtons_image.get_rect (center = (450, 800))
 
 
+
+
+        textx1,texty1 = 175, 350
+        self.texttrash = "speed cost : " + str(self.spedcost)
+        font = pygame.font.Font('freesansbold.ttf', 32)
+        self.textsped = font.render(self.texttrash, True, "black")
+        self.spedrect = self.textsped.get_rect()
+        self.spedrect.topleft = (textx1, texty1)
+
+        textx2,texty2 = 595, 350
+        self.texttrash = "AC Cost : " + str(self.ACcost)
+        font = pygame.font.Font('freesansbold.ttf', 32)
+        self.textAC = font.render(self.texttrash, True, "black")
+        self.ACrect = self.textAC.get_rect()
+        self.ACrect.topleft = (textx2, texty2)
+
+        textx3,texty3 = 610, 660
+        self.texttrash = "extra Cost : " + str(self.extracost)
+        font = pygame.font.Font('freesansbold.ttf', 32)
+        self.texttrash = font.render(self.texttrash, True, "black")
+        self.extrarect = self.texttrash.get_rect()
+        self.extrarect.topleft = (textx3, texty3)
+
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -325,18 +347,41 @@ class Game:
                             self.trash -= self.extracost
                             self.extra += 1
                             self.extracost *= 3
+                            
+                            self.texttrash = "extra Cost : " + str(self.extracost)
+                            self.texttrash = font.render(self.texttrash, True, "black")
+                            self.extrarect = self.texttrash.get_rect()
+                            
+                            self.texttrash = "Trash :" + str(self.trash)
+                            self.text = font.render(self.texttrash, True, "black")
+                            self.textRect = self.text.get_rect()
+
+
+
                     if self.spedButtons_rect.collidepoint(event.pos):
                         if self.trash >= self.spedcost:
                             self.trash -= self.spedcost
                             self.sped +=2
                             self.spedcost *= 3
+                            self.texttrash = "Trash :" + str(self.trash)
+                            self.text = font.render(self.texttrash, True, "black")
+                            self.textRect = self.text.get_rect()
+                            self.texttrash = "speed cost : " + str(self.spedcost)
+                            self.textsped = font.render(self.texttrash, True, "black")
+                            self.spedrect = self.textsped.get_rect()
                     if self.ACButtons_rect.collidepoint(event.pos):
-                        if self.trash >= self.extracost:
-                            self.trash -= self.extracost
+                        if self.trash >= self.ACcost:
+                            self.trash -= self.ACcost
                             if self.time == 0:
                                 self.time = 60
                             else:
                                 self.time -= 5
+                            self.texttrash = "Trash :" + str(self.trash)
+                            self.text = font.render(self.texttrash, True, "black")
+                            self.textRect = self.text.get_rect()
+                            self.texttrash = "AC Cost : " + str(self.ACcost)
+                            self.textAC = font.render(self.texttrash, True, "black")
+                            self.ACrect = self.textAC.get_rect()
                 
                     
             self.screen.blit(self.bbackground_image, (0,0 ))
@@ -345,10 +390,13 @@ class Game:
             self.screen.blit(self.ACButtons_image, self.ACButtons_rect)
             self.screen.blit(self.backButtons_image, self.backButtons_rect)
             self.screen.blit(self.text, self.textRect)
+            self.screen.blit(self.textsped, self.spedrect)
+            self.screen.blit(self.textAC, self.ACrect)
+            self.screen.blit(self.texttrash, self.extrarect)
+
             
             pygame.display.update()
             self.clock.tick(60)
-
         
     def touching_PC(self, char_x, door_x):
         touched = False

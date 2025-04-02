@@ -31,6 +31,12 @@ class Game:
         self.trash = 0
         self.texttrash = "Trash : " + str(self.trash)
 
+        self.seasontime = 120
+        self.season = 1
+        self.all_season = ["img/spring.png", "img/summer.png", "img/autumn.png", "img/winter.png"]
+        self.change_season = True
+
+
     def Main_menu(self):
         
 
@@ -73,7 +79,7 @@ class Game:
 
 
 
-        self.background_image = pygame.image.load("img/Background.png")
+        
         self.character_image = pygame.image.load("img/Player.png")
         self.character_image = pygame.transform.scale(self.character_image, (60, 130)) 
         self.floor_image = pygame.image.load("img/Terrain.png")
@@ -95,6 +101,8 @@ class Game:
         gravity = 1
         jump_power = -15
         on_floor = False
+
+        self.seasonstart = time.time()
 
 
         self.texttrash = "Trash : " + str(self.trash)
@@ -158,8 +166,6 @@ class Game:
                     self.char_y = self.Floor_rect.top - 130 
                     char_velocity_y = 0  
                     on_floor = True
-                else:
-                    on_floor = False
             else:
                 on_floor = False
 
@@ -169,11 +175,27 @@ class Game:
                 if self.ACtimeend - self.ACtimestart > self.time:
                     self.ACtimestart = time.time()
                     self.trash += 1
+                    self.texttrash = "Trash :" + str(self.trash)
+                    self.text = font.render(self.texttrash, True, "black")
+                    self.textRect = self.text.get_rect()
+                    self.textRect.topleft = (textx, texty)
                 
 
 
 
             self.char_x = max(0, min(self.char_x, 850))  
+
+            self.seasonend = time.time()
+            
+            if self.seasonend - self.seasonstart > self.seasontime:
+                self.seasonstart = time.time()
+                self.season = (self.season + 1) % 4
+                self.change_season = True
+            if self.change_season == True:
+                self.background_image = pygame.image.load(self.all_season[self.season])
+                self.change_season = False
+
+
 
             # Draw background, floor, and character
             self.screen.blit(self.background_image, (0, 0))
@@ -186,8 +208,9 @@ class Game:
             self.end = time.time()
             if self.end - self.start > self.random_time:
                 self.start = time.time()
-                self.random_time = random.randint(3, 7)
-                if len(self.list_trash) < 4:
+                # self.random_time = 0.5
+                self.random_time = random.randint(1,7)
+                if len(self.list_trash) < 5:
                     self.list_trash.append([random.randint(300, 800), 770])
                     
             
@@ -313,24 +336,22 @@ class Game:
 
 
         textx1,texty1 = 175, 350
-        self.texttrash = "speed cost : " + str(self.spedcost)
+        self.textsped = "speed cost : " + str(self.spedcost)
         font = pygame.font.Font('freesansbold.ttf', 32)
-        self.textsped = font.render(self.texttrash, True, "black")
-        self.spedrect = self.textsped.get_rect()
+        self.spedt = font.render(self.textsped, True, "black")
+        self.spedrect = self.spedt.get_rect()
         self.spedrect.topleft = (textx1, texty1)
 
         textx2,texty2 = 595, 350
-        self.texttrash = "AC Cost : " + str(self.ACcost)
-        font = pygame.font.Font('freesansbold.ttf', 32)
-        self.textAC = font.render(self.texttrash, True, "black")
-        self.ACrect = self.textAC.get_rect()
+        self.textAC = "AC Cost : " + str(self.ACcost)
+        self.ACt = font.render(self.textAC, True, "black")
+        self.ACrect = self.ACt.get_rect()
         self.ACrect.topleft = (textx2, texty2)
 
         textx3,texty3 = 610, 660
-        self.texttrash = "extra Cost : " + str(self.extracost)
-        font = pygame.font.Font('freesansbold.ttf', 32)
-        self.texttrash = font.render(self.texttrash, True, "black")
-        self.extrarect = self.texttrash.get_rect()
+        self.textextra = "extra Cost : " + str(self.extracost)
+        self.extrat = font.render(self.textextra, True, "black")
+        self.extrarect = self.extrat.get_rect()
         self.extrarect.topleft = (textx3, texty3)
 
         while True:
@@ -348,13 +369,15 @@ class Game:
                             self.extra += 1
                             self.extracost *= 3
                             
-                            self.texttrash = "extra Cost : " + str(self.extracost)
-                            self.texttrash = font.render(self.texttrash, True, "black")
-                            self.extrarect = self.texttrash.get_rect()
+                            self.textextra = "extra Cost : " + str(self.extracost)
+                            self.extrat = font.render(self.textextra, True, "black")
+                            self.extrarect = self.extrat.get_rect()
+                            self.extrarect.topleft = (textx3, texty3)
                             
                             self.texttrash = "Trash :" + str(self.trash)
                             self.text = font.render(self.texttrash, True, "black")
                             self.textRect = self.text.get_rect()
+                            self.textRect.topleft = (600, 50)
 
 
 
@@ -363,14 +386,18 @@ class Game:
                             self.trash -= self.spedcost
                             self.sped +=2
                             self.spedcost *= 3
+
                             self.texttrash = "Trash :" + str(self.trash)
                             self.text = font.render(self.texttrash, True, "black")
                             self.textRect = self.text.get_rect()
-                            self.texttrash = "speed cost : " + str(self.spedcost)
-                            self.textsped = font.render(self.texttrash, True, "black")
-                            self.spedrect = self.textsped.get_rect()
+                            self.textRect.topleft = (600, 50)
+
+                            self.textsped = "speed cost : " + str(self.spedcost)
+                            self.spedt = font.render(self.textsped, True, "black")
+                            self.spedrect = self.spedt.get_rect()
+                            self.spedrect.topleft = (textx1, texty1)
                     if self.ACButtons_rect.collidepoint(event.pos):
-                        if self.trash >= self.ACcost:
+                        if self.trash >= self.ACcost and self.time != 5:
                             self.trash -= self.ACcost
                             if self.time == 0:
                                 self.time = 60
@@ -379,9 +406,11 @@ class Game:
                             self.texttrash = "Trash :" + str(self.trash)
                             self.text = font.render(self.texttrash, True, "black")
                             self.textRect = self.text.get_rect()
-                            self.texttrash = "AC Cost : " + str(self.ACcost)
-                            self.textAC = font.render(self.texttrash, True, "black")
-                            self.ACrect = self.textAC.get_rect()
+                            self.textRect.topleft = (600, 50)
+                            self.textAC = "AC Cost : " + str(self.ACcost)
+                            self.ACt = font.render(self.textAC, True, "black")
+                            self.ACrect = self.ACt.get_rect()
+                            self.ACrect.topleft = (textx2, texty2)
                 
                     
             self.screen.blit(self.bbackground_image, (0,0 ))
@@ -390,9 +419,9 @@ class Game:
             self.screen.blit(self.ACButtons_image, self.ACButtons_rect)
             self.screen.blit(self.backButtons_image, self.backButtons_rect)
             self.screen.blit(self.text, self.textRect)
-            self.screen.blit(self.textsped, self.spedrect)
-            self.screen.blit(self.textAC, self.ACrect)
-            self.screen.blit(self.texttrash, self.extrarect)
+            self.screen.blit(self.spedt, self.spedrect)
+            self.screen.blit(self.ACt, self.ACrect)
+            self.screen.blit(self.extrat, self.extrarect)
 
             
             pygame.display.update()

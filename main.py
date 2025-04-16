@@ -31,10 +31,11 @@ class Game:
         self.trash = 0
         self.texttrash = "Trash : " + str(self.trash)
 
-        self.seasontime = 120
+        self.seasontime = 20
         self.season = 1
         self.all_season = ["img/spring.png", "img/summer.png", "img/autumn.png", "img/winter.png"]
         self.change_season = True
+        self.season_movement = 5
 
 
     def Main_menu(self):
@@ -101,6 +102,8 @@ class Game:
         gravity = 1
         jump_power = -15
         on_floor = False
+        season_extra = 0
+        self.season_movement = 5
 
         self.seasonstart = time.time()
 
@@ -120,9 +123,9 @@ class Game:
                 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RIGHT:
-                        char_velocity_x = 5  + self.sped
+                        char_velocity_x = 5  + self.sped + self.season_movement
                     if event.key == pygame.K_LEFT:
-                        char_velocity_x = -5  - self.sped
+                        char_velocity_x = -5  - self.sped - self.season_movement
                     if event.key == pygame.K_UP and on_floor:  
                         char_velocity_y = jump_power
 
@@ -137,7 +140,11 @@ class Game:
                         housed = self.touching_house(self.char_x,40)
                         if touched:
                             self.list_trash.remove(self.list_trash[num])
-                            self.trash += self.extra
+                            if self.season == 0:
+                                season_extra = int(self.extra * 2)
+                            else:
+                                season_extra = 0
+                            self.trash += (self.extra + season_extra)
                             print("Trash:", self.trash)
                             self.texttrash = "Trash :" + str(self.trash)
                             self.text = font.render(self.texttrash, True, "black")
@@ -156,7 +163,7 @@ class Game:
             char_velocity_y += gravity
 
             
-            self.char_x += char_velocity_x
+            self.char_x += char_velocity_x 
             self.char_y += char_velocity_y
 
             
@@ -191,9 +198,17 @@ class Game:
                 self.seasonstart = time.time()
                 self.season = (self.season + 1) % 4
                 self.change_season = True
+                if self.season == 0:
+                    season_extra = int(self.extra * 1.3)
+                elif self.season == 1:
+                    self.season_movement = 5
+                    season_extra = 0
+                elif self.season == 2:
+                    self.season_movement = 0
             if self.change_season == True:
                 self.background_image = pygame.image.load(self.all_season[self.season])
                 self.change_season = False
+
 
 
 
@@ -208,8 +223,12 @@ class Game:
             self.end = time.time()
             if self.end - self.start > self.random_time:
                 self.start = time.time()
-                # self.random_time = 0.5
-                self.random_time = random.randint(1,7)
+                if self.season == 0:
+                    self.random_time = random.randint(1,7)
+                elif self.season == 2:
+                    self.random_time = random.randint(1,4)
+                else:
+                    self.random_time = random.randint(3,9)
                 if len(self.list_trash) < 5:
                     self.list_trash.append([random.randint(300, 800), 770])
                     
@@ -272,9 +291,11 @@ class Game:
                         if door_touched:
                             self.char_x, self.char_y = 60, 600
                             self.Background()
-                            
+
+
                         elif PCtouched:
                             self.PC()
+                
 
                 if event.type == pygame.KEYUP:
                     if event.key in [pygame.K_RIGHT, pygame.K_LEFT, pygame.K_d, pygame.K_a]:
